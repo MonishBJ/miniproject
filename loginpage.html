@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTODYZ8iK7BKGLUiRj9P1ezGYUK2OwajOTO3g&usqp=CAU');
+            background-size: contain; 
+            background-position: center; 
+            background-repeat: no-repeat; 
+            background-size:cover;
+        }
+        .login-container h1{
+            text-align: center;
+        }
+        .login-container {
+            background-color: white;
+            width: 300px;
+            margin: 100px auto;
+            padding: 20px;
+            border-radius: 5px;
+        }
+        .login-container input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid papayawhip;
+            border-radius: 3px;
+            box-sizing: border-box;
+        }
+        .login-container input[type="submit"] {
+            background-color: blue;
+            border: none;
+            border-radius: 3px;
+            color: white;
+            cursor: pointer;
+        }
+        .login-container input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+        .forgot-password,
+    .not-registered {
+    color: black;
+    text-align: center;
+    margin-top: 10px;
+    font-size: 14px;
+}
+    </style>
+</head>
+<body>
+    
+    <div class="login-container">
+        <h2><b>Login Page</b></h2><br>
+        <!-- <form action="#" method="post"> -->
+        <label><b>USERNAME</b><br><input type="text" name="username" placeholder="Username" id="username" required></label><br>
+        <label><b>PASSWORD</b><br><input type="password" name="password" placeholder="Password" id="password" required></label><br>
+        <button type="button" onclick=login()>Login</button>
+        <!-- </form> -->
+        <div class="forgot-password">
+            <a href=""><b>Forgot Password?</b></a>
+        </div>
+                <script>
+                    function login() {
+                        const username = document.getElementById("username").value;
+                        const password = document.getElementById("password").value;
+                        
+                        const data = {
+                            username: username,
+                            password: password
+                        };
+            
+                        fetch('http://localhost:3001/login', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(data),
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Network response was not ok');
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            if(data.success){
+                            localStorage.setItem("token",data.token);
+                            window.location.href = 'list.html';
+                        }})
+                        .catch(error => {
+                            console.error('There was an error!', error);
+                        });
+                    }
+                </script>
+</body>
+</html>

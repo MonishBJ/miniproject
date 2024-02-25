@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Item Details</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTODYZ8iK7BKGLUiRj9P1ezGYUK2OwajOTO3g&usqp=CAU');
+            background-size: cover;
+            background-position: center;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        input[type="number"] {
+            width: 100px;
+            padding: 8px;
+            margin-right: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #itemDetails {
+            margin-top: 20px;
+        }
+
+        #itemDetails p {
+            font-size: 16px;
+            line-height: 1.5;
+        }
+
+        #itemDetails p strong {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Item Details</h1>
+    <div id="itemDetails"></div>
+    <div>
+        <label for="quantityInput">Quantity:</label>
+        <input type="number" id="quantityInput" min="0">
+        <button onclick="updateQuantity()">Update Quantity</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const itemId = urlParams.get('itemId');
+
+
+            fetch(`http://localhost:3001/items/${itemId}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': localStorage.getItem('token')
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const itemDetails = document.getElementById('itemDetails');
+                    itemDetails.innerHTML = `
+                        <p><strong>Description:</strong> ${data.item.description}</p>
+                    `;
+                    document.getElementById('quantityInput').value = data.item.quantity;
+                } else {
+                    console.error('Error fetching item details:', data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching item details:', error);
+            });
+        });
+
+async function updateQuantity() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const itemId = urlParams.get('itemId');
+    const newQuantity = document.getElementById('quantityInput').value;
+    try {
+        const response = await fetch(`http://localhost:3001/update/${itemId}` , {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                 'Authorization': localStorage.getItem('token')
+            },
+            body: JSON.stringify({ newQuantity })
+        });
+        if (!response.ok) {
+            throw new Error('Failed to update item');
+        }
+        alert('Item updated successfully');
+        window.location.href = 'list.html';
+    } catch (error) {
+        console.error(error.message);
+    }
+}
+    </script>
+</body>
+</html>

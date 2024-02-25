@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Items Table</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTODYZ8iK7BKGLUiRj9P1ezGYUK2OwajOTO3g&usqp=CAU'); 
+            background-size: cover;
+            background-position: center;
+            background-color: #f8f8f8;
+            padding: 20px;
+        }
+        
+        #result2 {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        th {
+            background-color: #f2f2f2;
+        }
+        
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        
+        a {
+            color: blue;
+            text-decoration: none;
+        }
+        
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div id="result2"></div>
+    <script>
+        console.log(typeof(productName))
+        console.log(typeof(quantity))
+    document.addEventListener('DOMContentLoaded', function() {
+        fetch('http://localhost:3001/items', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                 'Authorization':localStorage.getItem('token')
+            },
+        })
+        .then(response => {
+            console.log('Response Status:', response.status);
+            return response.json();
+        })
+        .then(data => {
+            if(data.success){
+            console.log('Item List:', data?.items || []);
+    
+            const itemsTable = createTable(data?.items, ['itemId', 'productName', 'location', 'vendor','quantity']);
+            document.getElementById('result2').appendChild(itemsTable);
+        }})
+        .catch(error => {
+            console.error('Error fetching items:', error);
+            document.getElementById('result2').innerText = 'Error fetching items';
+        });
+    
+        function createTable(items, includedAttributes) {
+            const table = document.createElement('table');
+            table.border = '1';
+    
+            const headerRow = document.createElement('tr');
+            includedAttributes.forEach(attribute => {
+                const th = document.createElement('th');
+                th.textContent = attribute;
+                headerRow.appendChild(th);
+            });
+            table.appendChild(headerRow);
+            items.forEach(item => {
+                const row = document.createElement('tr');
+                includedAttributes.forEach(attribute => {
+                    const td = document.createElement('td');
+                    if (attribute === 'itemId') {
+                        const link = document.createElement('a');
+                        link.href = `details.html?itemId=${item[attribute]}`;
+                        link.textContent = item[attribute];
+                        td.appendChild(link);
+                    } else {
+                        td.textContent = item[attribute];
+                    }
+                    row.appendChild(td);
+                });
+                table.appendChild(row);
+            });
+    
+            return table;
+        }
+    });
+</script>
+</body>
+</html>
+
